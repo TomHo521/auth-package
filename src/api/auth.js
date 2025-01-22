@@ -1,18 +1,29 @@
-import axios from 'axios';
+import { auth } from '../firebase';
 
-const API_URL = process.env.REACT_APP_API_URL;
-
-export const login = async (email, password) => {
-  const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-  return response.data;
+// Store the Firebase ID token in localStorage
+export const storeToken = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    localStorage.setItem('token', token);
+  }
 };
 
-export const register = async (userData) => {
-  const response = await axios.post(`${API_URL}/auth/register`, userData);
-  return response.data;
+// Remove the Firebase ID token from localStorage
+export const removeToken = () => {
+  localStorage.removeItem('token');
 };
 
-export const logout = async () => {
-  const response = await axios.post(`${API_URL}/auth/logout`);
-  return response.data;
+// Check if the user is authenticated
+export const isAuthenticated = () => {
+  return !!localStorage.getItem('token');
+};
+
+// Get the current user's ID token
+export const getToken = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    return await user.getIdToken();
+  }
+  return null;
 };
